@@ -1,0 +1,77 @@
+---
+title: "R Notebook"
+output: pdf_document
+---
+
+```{r}
+library(rogme)
+```
+
+
+```{r}
+set.seed(21)
+pop<-rlnorm(1000000)
+pop.q <- quantile(pop, probs = seq(0.1,0.9,0.1))
+round(pop.q, digits = 2)
+```
+
+```{r}
+nsim<-10000
+est9 <- apply(matrix(sample(pop, 50*nsim, replace=TRUE),nrow = nsim),1,quantile,probs=0.9)
+mean(est9)
+median(est9)
+hist(est9, 50)
+```
+
+```{r}
+nsim<-10000
+est9 <- apply(matrix(sample(pop, 50*nsim, replace=TRUE),nrow = nsim),1,quantile,probs=0.9, type=8)
+mean(est9)
+median(est9)
+hist(est9, 50)
+```
+
+```{r}
+est9 <- apply(matrix(sample(pop, 50*nboot, replace=TRUE),nrow = nboot),1,hd,q=0.9)
+mean(est9)
+median(est9)
+hist(est9, 50)
+```
+
+## decile 1
+```{r}
+nsim<-10000
+est1 <- apply(matrix(sample(pop, 50*nsim, replace=TRUE),nrow = nsim),1,quantile,probs=0.1, type=8)
+mean(est1)
+median(est1)
+hist(est1, 50)
+```
+
+```{r}
+est1 <- apply(matrix(sample(pop, 50*nboot, replace=TRUE),nrow = nboot),1,hd,q=0.1)
+mean(est1)
+median(est1)
+hist(est1, 50)
+```
+
+# simulation:
+lognormal distribution
+vary sample size
+
+```{r}
+nsim <- 10000
+nt <- 50
+qseq <- seq(0.1,0.9,0.1)
+sim <- matrix(sample(pop, nt*nsim, replace=TRUE),nrow = nsim)
+ 
+res.qt8 <- apply(sim,1,quantile, probs = qseq, type=8)
+res.hd <- apply(sim,1,hdseq)
+
+round(apply(res.qt8, 1, mean) - pop.q, digits = 3)
+round(apply(res.qt8, 1, median) - pop.q, digits = 3)
+
+round(apply(res.hd, 1, mean) - pop.q, digits = 3)
+round(apply(res.hd, 1, median) - pop.q, digits = 3)
+```
+
+

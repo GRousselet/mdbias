@@ -1,0 +1,115 @@
+---
+title: 'Bias in parameter estimation of ex Gaussian fits'
+author: "Guillaume A. Rousselet"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    fig_caption: no
+    number_sections: no
+    toc: yes
+    toc_depth: 2
+---
+
+```{r message=FALSE}
+# dependencies
+library(ggplot2)
+library(cowplot)
+library(tibble)
+library(retimes)
+```
+
+```{r}
+sessionInfo()
+```
+
+# Skewed distribution
+
+```{r}
+set.seed(21)
+pop <- rexgauss(100000, mu = 400, sigma = 50, tau = 150)
+hist(pop, breaks = 50, xlim = c(0, 2000))
+
+pop.m <- mean(pop)
+pop.md <- median(pop)
+```
+
+# Check ex Gaussian fit
+
+```{r}
+pop.param <- timefit(pop, plot = TRUE)
+```
+
+# Population parameter values
+```{r}
+pop.param@par
+round(pop.m)
+round(pop.md)
+```
+
+# Get parameters for subsamples
+
+```{r eval=FALSE}
+nsim <- 10000
+nsamp <- 30
+samp.fit <- matrix(NA, nrow = nsim, ncol = 3)
+samp.md <- matrix(NA, nrow = nsim, ncol = 1)
+
+set.seed(21)
+
+for(iter in 1:nsim){
+  samp <- sample(pop, nsamp, replace = TRUE)
+  out <- timefit(samp)
+  samp.fit[iter,] <- out@par
+  samp.md[iter] <- median(samp)
+}
+
+colnames(samp.fit) <- c("mu", "sigma", "tau")
+```
+
+Median bias
+```{r}
+mean(samp.md) - pop.md
+```
+
+# Illustrate parameters
+
+```{r}
+todo <- 1
+
+mean(samp.fit[,todo])
+
+# create data frame
+df <- tibble(values = samp.fit[,todo])
+
+# make plot
+ggplot(df, aes(x = values)) + theme_classic() +
+  geom_density() 
+```
+
+```{r}
+todo <- 2
+
+mean(samp.fit[,todo])
+
+# create data frame
+df <- tibble(values = samp.fit[,todo])
+
+# make plot
+ggplot(df, aes(x = values)) + theme_classic() +
+  geom_density() 
+```
+
+```{r}
+todo <- 3
+
+mean(samp.fit[,todo])
+
+# create data frame
+df <- tibble(values = samp.fit[,todo])
+
+# make plot
+ggplot(df, aes(x = values)) + theme_classic() +
+  geom_density() 
+```
+
+
